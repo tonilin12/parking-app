@@ -1,25 +1,27 @@
-const express = require("express");
+    const express = require("express");
 
-const userRoutes = require("./routes/userRoutes");
-const parkingSpotRoutes = require("./routes/parkingSpotRoutes");
-const reservationRoutes = require("./routes/reservationRoutes");
+    // Routes are not configured yet
+    // const userRoutes = require("./routes/userRoutes");
+    // const parkingSpotRoutes = require("./routes/parkingSpotRoutes");
+    // const reservationRoutes = require("./routes/reservationRoutes");
 
-const app = express();
+    const app = express();
 
-app.use(express.json());
+    app.use(express.json());
 
-app.use("/users", userRoutes);
-app.use("/parking-spots", parkingSpotRoutes);
-app.use("/reservations", reservationRoutes);
+    // Route modules are not configured yet
+    // app.use("/users", userRoutes);
+    // app.use("/parking-spots", parkingSpotRoutes);
+    // app.use("/reservations", reservationRoutes);
 
-app.get("/", (req, res) => {
-    res.json({
-        message: "Parking reservation API is running"
+    app.get("/", (req, res) => {
+        res.json({
+            message: "Parking reservation API is running"
+        });
     });
-});
 
-const PORT = 3000;
+    const PORT = 3000;
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });

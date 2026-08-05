@@ -20,13 +20,6 @@ describe("Seed data validation tests", () => {
     });
 
 
-    test("Seeder creates exactly 20 users", async () => {
-        const count = await prisma.user.count();
-
-        expect(count).toBe(20);
-    });
-
-
     test("Seeder creates exactly 30 parking spots", async () => {
         const count = await prisma.parkingSpot.count();
 
@@ -38,47 +31,6 @@ describe("Seed data validation tests", () => {
         const count = await prisma.reservation.count();
 
         expect(count).toBe(50);
-    });
-
-
-    test("Every user has a non-empty name", async () => {
-        const users = await prisma.user.findMany();
-
-        for (const user of users) {
-            expect(typeof user.name).toBe("string");
-            expect(user.name.trim().length).toBeGreaterThan(0);
-        }
-    });
-
-
-    test("Every user has a valid-looking email", async () => {
-        const users = await prisma.user.findMany();
-
-        for (const user of users) {
-            expect(typeof user.email).toBe("string");
-            expect(user.email).toContain("@");
-            expect(user.email.trim().length).toBeGreaterThan(3);
-        }
-    });
-
-
-    test("Every user email is unique", async () => {
-        const users = await prisma.user.findMany();
-
-        const emails = users.map(user => user.email);
-        const uniqueEmails = new Set(emails);
-
-        expect(uniqueEmails.size).toBe(emails.length);
-    });
-
-
-    test("Every user has an automatically generated id", async () => {
-        const users = await prisma.user.findMany();
-
-        for (const user of users) {
-            expect(typeof user.id).toBe("number");
-            expect(user.id).toBeGreaterThan(0);
-        }
     });
 
 
@@ -102,7 +54,9 @@ describe("Seed data validation tests", () => {
 
         for (const parkingSpot of parkingSpots) {
             expect(typeof parkingSpot.id).toBe("number");
-            expect(parkingSpot.id).toBeGreaterThan(0);
+
+            expect(parkingSpot.id)
+                .toBeGreaterThan(0);
         }
     });
 
@@ -125,9 +79,9 @@ describe("Seed data validation tests", () => {
         for (const parkingSpot of parkingSpots) {
 
             if (parkingSpot.location === null) {
-                expect(parkingSpot.location).toBeNull();
-            }
-            else {
+                expect(parkingSpot.location)
+                    .toBeNull();
+            } else {
                 expect(typeof parkingSpot.location)
                     .toBe("string");
             }
@@ -140,29 +94,11 @@ describe("Seed data validation tests", () => {
             await prisma.reservation.findMany();
 
         for (const reservation of reservations) {
-            expect(typeof reservation.id).toBe("number");
+            expect(typeof reservation.id)
+                .toBe("number");
 
             expect(reservation.id)
                 .toBeGreaterThan(0);
-        }
-    });
-
-
-    test("Every reservation references an existing user", async () => {
-        const reservations =
-            await prisma.reservation.findMany({
-                include: {
-                    user: true
-                }
-            });
-
-        for (const reservation of reservations) {
-
-            expect(reservation.user)
-                .not.toBeNull();
-
-            expect(reservation.user.id)
-                .toBe(reservation.userId);
         }
     });
 
@@ -272,25 +208,6 @@ describe("Seed data validation tests", () => {
     });
 
 
-    test("User to Reservation relation works correctly", async () => {
-        const users =
-            await prisma.user.findMany({
-                include: {
-                    reservations: true
-                }
-            });
-
-        for (const user of users) {
-
-            for (const reservation of user.reservations) {
-
-                expect(reservation.userId)
-                    .toBe(user.id);
-            }
-        }
-    });
-
-
     test("ParkingSpot to Reservation relation works correctly", async () => {
         const parkingSpots =
             await prisma.parkingSpot.findMany({
@@ -313,25 +230,18 @@ describe("Seed data validation tests", () => {
     });
 
 
-    test("Reservation can load both its User and ParkingSpot", async () => {
+    test("Reservation can load its ParkingSpot", async () => {
         const reservations =
             await prisma.reservation.findMany({
                 include: {
-                    user: true,
                     parkingSpot: true
                 }
             });
 
         for (const reservation of reservations) {
 
-            expect(reservation.user)
-                .not.toBeNull();
-
             expect(reservation.parkingSpot)
                 .not.toBeNull();
-
-            expect(reservation.user.id)
-                .toBe(reservation.userId);
 
             expect(reservation.parkingSpot.id)
                 .toBe(reservation.parkingSpotId);
@@ -376,28 +286,6 @@ describe("Seed data validation tests", () => {
                     next.startTime.getTime()
                 );
             }
-        }
-    });
-
-
-    test("All reservations use ids belonging to seeded users", async () => {
-
-        const users =
-            await prisma.user.findMany();
-
-        const reservations =
-            await prisma.reservation.findMany();
-
-        const userIds =
-            new Set(
-                users.map(user => user.id)
-            );
-
-        for (const reservation of reservations) {
-
-            expect(
-                userIds.has(reservation.userId)
-            ).toBe(true);
         }
     });
 

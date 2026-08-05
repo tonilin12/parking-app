@@ -4,10 +4,6 @@ const { PrismaClient } = require("@prisma/client");
 const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
 
 const {
-    createUserData
-} = require("./factories/userFactory");
-
-const {
     createParkingSpotData
 } = require("./factories/parkingSpotFactory");
 
@@ -28,21 +24,6 @@ async function main() {
 
     await prisma.reservation.deleteMany();
     await prisma.parkingSpot.deleteMany();
-    await prisma.user.deleteMany();
-
-    console.log("Creating users...");
-
-    const users = [];
-
-    for (let i = 0; i < 20; i++) {
-        const user = await prisma.user.create({
-            data: createUserData()
-        });
-
-        users.push(user);
-    }
-
-    console.log(`Created ${users.length} users`);
 
     console.log("Creating parking spots...");
 
@@ -64,7 +45,6 @@ async function main() {
 
     for (let i = 0; i < 50; i++) {
         const reservationData = createReservationData(
-            users,
             parkingSpots
         );
 

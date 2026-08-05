@@ -6,13 +6,6 @@ datasource db {
   provider = "sqlite"
 }
 
-model User {
-  id           Int           @id @default(autoincrement())
-  name         String
-  email        String        @unique
-  reservations Reservation[]
-}
-
 model ParkingSpot {
   id           Int           @id @default(autoincrement())
   name         String
@@ -28,11 +21,9 @@ model Reservation {
   status        ReservationStatus @default(CONFIRMED)
   createdAt     DateTime           @default(now())
 
-  userId        Int
   parkingSpotId Int
 
-  user        User        @relation(fields: [userId], references: [id])
-  parkingSpot ParkingSpot @relation(fields: [parkingSpotId], references: [id])
+  parkingSpot   ParkingSpot @relation(fields: [parkingSpotId], references: [id])
 
   @@index([parkingSpotId, startTime, endTime])
 }
