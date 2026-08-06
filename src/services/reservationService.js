@@ -7,6 +7,7 @@ async function createReservation(
 ) {
     const start = new Date(startTime);
     const end = new Date(endTime);
+    const now = new Date();
 
     if (
         Number.isNaN(start.getTime()) ||
@@ -21,11 +22,17 @@ async function createReservation(
         );
     }
 
+    if (start < now) {
+        throw new Error(
+            "Cannot create a reservation in the past"
+        );
+    }
+
     const parkingSpot =
         await prisma.parkingSpot.findUnique({
             where: {
-                id: parkingSpotId
-            }
+                id: parkingSpotId,
+            },
         });
 
     if (!parkingSpot) {
@@ -44,17 +51,14 @@ async function createReservation(
         await prisma.reservation.findFirst({
             where: {
                 parkingSpotId,
-
                 status: "CONFIRMED",
-
                 startTime: {
-                    lt: end
+                    lt: end,
                 },
-
                 endTime: {
-                    gt: start
-                }
-            }
+                    gt: start,
+                },
+            },
         });
 
     if (conflict) {
@@ -67,11 +71,11 @@ async function createReservation(
         data: {
             parkingSpotId,
             startTime: start,
-            endTime: end
-        }
+            endTime: end,
+        },
     });
 }
 
 module.exports = {
-    createReservation
+    createReservation,
 };
